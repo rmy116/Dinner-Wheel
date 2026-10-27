@@ -60,6 +60,25 @@
 
     h1 span { color: var(--gold); }
 
+    .dash {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 6px 16px;
+      margin-bottom: 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--cream);
+      font-weight: 700;
+      font-size: 0.92rem;
+      text-decoration: none;
+    }
+
+    .dash:hover { border-color: var(--gold); }
+    .dash:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
     .layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 320px;
@@ -280,6 +299,7 @@
   <canvas id="confetti"></canvas>
   <div class="page">
     <header>
+      <a class="dash" href="https://rmy116.github.io/math-games/">&#x1F9E9; All Turk's Puzzles &rsaquo;</a>
       <p class="kicker">Family dinner night</p>
       <h1>Spin the <span>Dinner Wheel</span></h1>
     </header>

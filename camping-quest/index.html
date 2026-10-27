@@ -65,6 +65,11 @@
   .item button.worn{background:#1e88e5;box-shadow:0 3px 0 #0d47a1}
   .item button.worn2{background:#fb8c00;box-shadow:0 3px 0 #a65c00}
   .coins{font-size:clamp(17px,4.4vmin,28px);font-weight:bold;color:#a65c00}
+  a.dash{display:inline-flex;align-items:center;gap:6px;min-height:40px;box-sizing:border-box;padding:6px 16px;margin:10px 0 2px;border-radius:999px;
+       border:3px solid #ffcc80;background:#fff;color:#a65c00;font-weight:bold;font-size:clamp(14px,3.4vmin,19px);text-decoration:none}
+  a.dash:hover,a.dash:focus-visible{border-color:#ff8f00;outline:none}
+  a.btn-ico.dashico{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+  #leave{z-index:6}
 </style>
 </head>
 <body>
@@ -76,6 +81,7 @@
   <span class="pill">Lv <span id="level">1</span>: <span id="goal"></span></span>
   <span class="pill" id="clock">☀️</span>
   <span class="sp"></span>
+  <a class="btn-ico dashico dash-go" href="https://rmy116.github.io/math-games/" aria-label="All Turk's Puzzles">🧩</a>
   <button class="btn-ico" id="muteBtn" aria-label="Mute">🔊</button>
   <button class="btn-ico" id="pauseBtn" aria-label="Pause">⏸️</button>
 </div>
@@ -98,6 +104,7 @@
     <p class="coins" id="coinsTitle"></p>
     <p class="how" id="howText"></p>
     <p class="how" id="bestTitle"></p>
+    <a class="dash dash-go" href="https://rmy116.github.io/math-games/">🧩 All Turk's Puzzles ›</a>
   </div>
 </div>
 
@@ -110,14 +117,14 @@
     <div class="items" id="upItems"></div>
     <h3>🎩 Outfits</h3>
     <div class="items" id="outItems"></div>
-    <button class="big" id="shopDone">▶️ Let's Go!</button>
+    <button class="big" id="shopDone">▶️ Let's Go!</button><br><a class="dash dash-go" href="https://rmy116.github.io/math-games/">🧩 All Turk's Puzzles ›</a>
   </div>
 </div>
 
 <div id="pause" class="overlay hidden">
   <div class="card"><h2>⏸️ Paused</h2><p>Take a snack break!</p>
     <button class="big" id="resumeBtn">▶️ Keep Playing</button><br>
-    <button class="big alt" id="quitBtn">🏠 Main Menu</button></div>
+    <button class="big alt" id="quitBtn">🏠 Main Menu</button><br><a class="dash dash-go" href="https://rmy116.github.io/math-games/">🧩 All Turk's Puzzles ›</a></div>
 </div>
 
 <div id="over" class="overlay hidden">
@@ -125,7 +132,13 @@
     <p id="overScore"></p><p id="overBest"></p><p class="coins" id="overCoins"></p>
     <button class="big" id="againBtn">🔁 Play Again</button><br>
     <button class="big blue" id="shopBtnOver">🛒 Camp Shop</button>
-    <button class="big alt" id="menuBtn">🏠 Main Menu</button></div>
+    <button class="big alt" id="menuBtn">🏠 Main Menu</button><br><a class="dash dash-go" href="https://rmy116.github.io/math-games/">🧩 All Turk's Puzzles ›</a></div>
+</div>
+
+<div id="leave" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="leaveH">
+  <div class="card"><h2 id="leaveH">Leave this game?</h2><p>You'll go to all of Turk's Puzzles and this game will end.</p>
+    <button class="big" id="leaveStay">▶️ Keep Playing</button><br>
+    <button class="big alt" id="leaveGo">Leave</button></div>
 </div>
 
 <div id="touchCtl" class="hidden"></div>
@@ -530,6 +543,7 @@ const joys = [{active:false,id:null,sx:0,sy:0,x:0,y:0},{active:false,id:null,sx:
 addEventListener('keydown', e=>{
   const k = e.key.toLowerCase();
   if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
+  if(!$('leave').classList.contains('hidden')){ if(k==='escape'){ e.preventDefault(); show('leave',false); } return; }
   if(k==='p'||k==='escape'){ setPause(state==='play'); return; }
   if(k==='m'){ toggleMute(); return; }
   if(state==='play' && players.length){
@@ -602,6 +616,18 @@ $('shopBtnTitle').addEventListener('click', ()=>{ audio(); sfx.click(); openShop
 $('shopBtnOver').addEventListener('click', ()=>{ sfx.click(); openShop('over'); });
 $('shopDone').addEventListener('click', ()=>{ sfx.click(); closeShop(); });
 $('muteBtn').textContent = SAVE.muted?'🔇':'🔊';
+// Link to the Turk's Puzzles dashboard; confirm first when a game is in progress
+let leaveHref = '';
+function midGame(){ return state==='play' || state==='pause' || (state==='shop' && shopReturn==='play'); }
+document.querySelectorAll('.dash-go').forEach(a=>a.addEventListener('click', e=>{
+  if(!midGame()) return;
+  e.preventDefault(); e.stopPropagation(); leaveHref = a.href;
+  if(state==='play') setPause(true);
+  show('leave',true); $('leaveStay').focus();
+}));
+$('leaveStay').addEventListener('click', ()=>show('leave',false));
+$('leave').addEventListener('click', e=>{ if(e.target===$('leave')) show('leave',false); });
+$('leaveGo').addEventListener('click', ()=>{ show('leave',false); location.href = leaveHref; });
 
 // ---------- UI helpers ----------
 function show(id,on){ $(id).classList.toggle('hidden',!on); if(id==='hud') $('touchCtl').classList.toggle('hidden', !on || !isTouch); }
